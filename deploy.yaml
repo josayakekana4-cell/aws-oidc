@@ -1,10 +1,8 @@
 name: Deploy to AWS
 
-on: [main]
-
-env:
-  AWS_REGION:${{secret.AWS_REGION}}
-  IAM_ROLE:${{secret.IAM_ROLE}}
+on:
+  push:
+    branches: [ main ]
 
 # Required for OIDC authentication
 permissions:
@@ -12,7 +10,7 @@ permissions:
   contents: read
 
 jobs:
-  AssumedRole:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -21,8 +19,8 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          role-to-assume: ${{env.IAM_ROLE}}
-          aws-region: ${{env.AWS_REGION}}
+          role-to-assume: arn:aws:iam::647845200726:role/GitHubActinCICDAssumeRole
+          aws-region: af-south-1
 
       - name: Verify AWS Identity
         run: aws sts get-caller-identity
