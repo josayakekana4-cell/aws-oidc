@@ -1,0 +1,30 @@
+name: Deploy to AWS
+
+on:
+  push:
+    branches: [ main ]
+
+env:
+  AWS_REGION:${{secret.AWS_REGION}}
+  IAM_ROLE:${{secret.IAM_ROLE}}
+
+# Required for OIDC authentication
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  AssumedRole:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{env.IAM_ROLE}}
+          aws-region: ${{env.AWS_REGION}}
+
+      - name: Verify AWS Identity
+        run: aws sts get-caller-identity
